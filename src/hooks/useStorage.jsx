@@ -1,29 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { projectStorage } from "../Firebase/config";
+import { useEffect, useState } from "react";
+import {
+  projectStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "../Firebase/config";
 
-const useStorage = file => {
+const useStorage = imageFile => {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [url, setUrl] = useState(null);
 
   useEffect(() => {
-    const storageRef = projectStorage.ref(file.name);
+    try {
+      const storageRef = ref(projectStorage, imageFile.name);
+      const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
-    storageRef.put(file).on(
-      "state_changed",
-      snap => {
-        let percentageUpload = (snap.bytesTransferred / snap.totalBytes) * 100;
-        setProgress(percentageUpload);
-      },
-      err => {
-        setError(err);
-      },
-      async () => {
-        const url = await storageRef.getDownloadURL();
-        setUrl(url);
-      }
-    );
-  }, [file]);
+      uploadTask.on(
+        "state_changed",
+        snapshot => {
+          let percentage =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          // console.log("Upload is " + percentage + "% done");
+          setProgress(percentage);
+        },
+        err => {
+          setError(err);
+        },
+        async () => {
+          getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
+            // console.log("File available at", downloadURL);
+            setUrl(downloadURL);
+          });
+        }
+      );
+    } catch (error) {
+      console.log("not working");
+    }
+  }, [imageFile]);
 
   return { progress, url, error };
 };
