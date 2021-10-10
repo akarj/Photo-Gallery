@@ -6,7 +6,12 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import * as firestore from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 
@@ -37,4 +42,5 @@ export {
   getDownloadURL,
   collection,
   addDoc,
+  onSnapshot,
 };
