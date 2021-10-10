@@ -4,7 +4,10 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  projectFirestore,
+  timestamp,
 } from "../Firebase/config";
+import { collection, addDoc } from "../Firebase/config";
 
 const useStorage = imageFile => {
   const [progress, setProgress] = useState(0);
@@ -16,26 +19,51 @@ const useStorage = imageFile => {
       const storageRef = ref(projectStorage, imageFile.name);
       const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
+      const l = async () => {
+        try {
+          const docRef = await addDoc(collection(projectFirestore, "users"), {
+            first: "Ada",
+            last: "Lovelace",
+            born: 1815,
+          });
+          console.log("Document written with ID: ", docRef.id);
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
+      };
+
+      l();
+
       uploadTask.on(
         "state_changed",
         snapshot => {
           let percentage =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          // console.log("Upload is " + percentage + "% done");
           setProgress(percentage);
         },
         err => {
           setError(err);
         },
         async () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
-            // console.log("File available at", downloadURL);
-            setUrl(downloadURL);
-          });
+          try {
+            const URL = await getDownloadURL(uploadTask.snapshot.ref);
+
+            setUrl(URL);
+            const docRef = await addDoc(
+              collection(projectFirestore, "images"),
+              {
+                url: URL,
+                createdAt: timestamp(),
+              }
+            );
+            console.log("Document written with ID: ", docRef.id);
+          } catch (e) {
+            console.error("Error adding document: ", { e });
+          }
         }
       );
     } catch (error) {
-      console.log("not working");
+      console.log("not working", { error });
     }
   }, [imageFile]);
 

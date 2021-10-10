@@ -1,20 +1,15 @@
 // Import the functions you need from the SDKs you need
 
-import "firebase/storage";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { getFirestore } from "firebase/firestore";
-
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import * as firestore from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCZ7jSPVI9cBYJpOEASE2JBEQFI5akWQWw",
   authDomain: "react-photo-gallery-app-dfbee.firebaseapp.com",
@@ -30,12 +25,16 @@ const app = initializeApp(firebaseConfig);
 const projectStorage = getStorage(app);
 const projectFirestore = getFirestore(app);
 const projectStorageRef = ref(projectStorage);
+const timestamp = firestore.serverTimestamp;
 
 export {
   projectFirestore,
   projectStorage,
   projectStorageRef,
+  timestamp,
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  collection,
+  addDoc,
 };
