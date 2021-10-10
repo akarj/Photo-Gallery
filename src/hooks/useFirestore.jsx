@@ -1,46 +1,17 @@
 import { useState, useEffect } from "react";
 import { projectFirestore, collection, onSnapshot } from "../Firebase/config";
 
-const useFirestore = collectionData => {
+const useFirestore = collectionName => {
   const [docs, setDocs] = useState([]);
   useEffect(() => {
-    try {
-      let Docs = [];
+    const unsub = onSnapshot(
+      collection(projectFirestore, collectionName),
+      snapshot =>
+        setDocs(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
+    );
 
-      onSnapshot(
-        collection(projectFirestore, "images"),
-        snapshot => {
-          snapshot.docs.forEach(doc => {
-            Docs.push({ ...doc.data(), id: doc.id });
-          });
-        },
-        error => {
-          console.log("error in getting file from database", error);
-        },
-        () => {
-          console.log("retreived files from database");
-          console.log("Docs", Docs);
-        }
-      );
-
-      // const unsub = projectFirestore
-      //   .collection(collectionData)
-      //   .orderBy("createdAt", "desc")
-      //   .onSnapshot(snap => {
-      //     let Docs = [];
-      //     snap.forEach(doc => {
-      //       doc.push({ ...doc.data(), id: doc.id });
-      //     });
-      console.log("Docs", Docs);
-
-      setDocs(Docs);
-      //   });
-
-      // return () => unsub();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+    return unsub;
+  }, [collectionName]);
   return { docs };
 };
 export default useFirestore;
