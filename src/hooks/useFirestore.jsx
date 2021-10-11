@@ -1,17 +1,27 @@
 import { useState, useEffect } from "react";
-import { projectFirestore, collection, onSnapshot } from "../Firebase/config";
+import {
+  projectFirestore,
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+} from "../Firebase/config";
 
 const useFirestore = collectionName => {
+  const collectionRef = collection(projectFirestore, collectionName);
+  const order = query(collectionRef, orderBy("createdAt", "desc"));
+
   const [docs, setDocs] = useState([]);
   useEffect(() => {
     const unsub = onSnapshot(
-      collection(projectFirestore, collectionName),
+      order,
+      // collection(projectFirestore, collectionName),
       snapshot =>
         setDocs(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })))
     );
 
     return unsub;
-  }, [collectionName]);
+  }, [collectionName, order]);
   return { docs };
 };
 export default useFirestore;

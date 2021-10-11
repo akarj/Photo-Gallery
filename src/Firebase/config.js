@@ -11,6 +11,8 @@ import {
   collection,
   addDoc,
   onSnapshot,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import * as firestore from "firebase/firestore";
 import { initializeApp } from "firebase/app";
@@ -43,4 +45,6 @@ export {
   collection,
   addDoc,
   onSnapshot,
+  query,
+  orderBy,
 };
